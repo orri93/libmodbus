@@ -1,16 +1,17 @@
 list(APPEND libmodbus_source modbus.c)
 
-if (LIB_MODBUS_WITH_DATA)
-  list(APPEND libmodbus_source modbus-data.c)
-endif ()
-if (LIB_MODBUS_WITH_RTU)
+if (LIBMODBUS_WITH_RTU)
   list(APPEND libmodbus_source modbus-rtu.c)
 endif ()
-if (LIB_MODBUS_WITH_TCP)
+if (LIBMODBUS_WITH_TCP)
   list(APPEND libmodbus_source modbus-tcp.c)
 endif ()
 
 add_library(libmodbus ${libmodbus_source})
+
+if (NOT BUILD_SHARED_LIBS)
+  set(LIBMODBUS_DEFINE_BUILD_STATIC "#define LIBMODBUS_BUILD_STATIC")
+endif ()
 
 configure_file(modbus-version.h.in modbus-version.h @ONLY)
 list(APPEND libmodbus_include ${CMAKE_CURRENT_BINARY_DIR})

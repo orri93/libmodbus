@@ -50,4 +50,7 @@
       LIBMODBUS_VERSION_MINOR == (minor) &&             \
       LIBMODBUS_VERSION_MICRO >= (micro)))
 
+/* Define LIBMODBUS_BUILD_STATIC if building static */
+@LIBMODBUS_DEFINE_BUILD_STATIC@
+
 #endif /* MODBUS_VERSION_H */
