@@ -1,4 +1,4 @@
-list(APPEND libmodbus_source modbus.c)
+list(APPEND libmodbus_source modbus.c modbus-data.c)
 
 if (LIBMODBUS_WITH_RTU)
   list(APPEND libmodbus_source modbus-rtu.c)
@@ -9,8 +9,8 @@ endif ()
 
 add_library(libmodbus ${libmodbus_source})
 
-if (NOT BUILD_SHARED_LIBS)
-  set(LIBMODBUS_DEFINE_BUILD_STATIC "#define LIBMODBUS_BUILD_STATIC")
+if (BUILD_SHARED_LIBS)
+  set(LIBMODBUS_DEFINE_BUILD_SHARED_LIBS "#define LIBMODBUS_BUILD_SHARED_LIBS")
 endif ()
 
 configure_file(modbus-version.h.in modbus-version.h @ONLY)

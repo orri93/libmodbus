@@ -50,7 +50,7 @@
       LIBMODBUS_VERSION_MINOR == (minor) &&             \
       LIBMODBUS_VERSION_MICRO >= (micro)))
 
-/* Define LIBMODBUS_BUILD_STATIC if building static */
-@LIBMODBUS_DEFINE_BUILD_STATIC@
+/* Define LIBMODBUS_BUILD_SHARED_LIBS if building shared */
+@LIBMODBUS_DEFINE_BUILD_SHARED_LIBS@
 
 #endif /* MODBUS_VERSION_H */
