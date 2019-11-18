@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#pragma warning(push)
+#pragma warning(disable : 6387)
+#pragma warning(disable : 28159)
+
 #include <stdio.h>
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -212,3 +216,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+#pragma warning(pop)
