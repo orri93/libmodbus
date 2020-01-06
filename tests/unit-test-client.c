@@ -5,11 +5,15 @@
  */
 
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <modbus.h>
+#ifdef _WIN32
+# define usleep(x) Sleep ( ( x ) / 1000 )
+#else
+# include <unistd.h>
+#endif
 
 #include "unit-test.h"
 
@@ -18,7 +22,9 @@ const int EXCEPTION_RC = 2;
 enum {
     TCP,
     TCP_PI,
-    RTU
+    RTU,
+    UDP,
+    UDP_PI
 };
 
 int test_server(modbus_t *ctx, int use_backend);
@@ -28,6 +34,20 @@ int send_crafted_request(modbus_t *ctx, int function,
                          int backend_length, int backend_offset);
 int equal_dword(uint16_t *tab_reg, const uint32_t value);
 
+#ifdef _WIN32
+#define BUG_REPORT(_cond, _format, ...) \
+  printf("\nLine %d: assertion error for '" # _cond "': " _format "\n", __LINE__, __VA_ARGS__)
+
+#define ASSERT_TRUE(_cond, _format, ...) {  \
+    if (_cond) {                                  \
+        printf("OK\n");                           \
+    } else {                                      \
+        BUG_REPORT(_cond, _format, __VA_ARGS__);  \
+        goto close;                               \
+    }                                             \
+};
+
+#else
 #define BUG_REPORT(_cond, _format, _args ...) \
     printf("\nLine %d: assertion error for '%s': " _format "\n", __LINE__, # _cond, ## _args)
 
@@ -39,6 +59,7 @@ int equal_dword(uint16_t *tab_reg, const uint32_t value);
         goto close;                               \
     }                                             \
 };
+#endif
 
 int equal_dword(uint16_t *tab_reg, const uint32_t value) {
     return ((tab_reg[0] == (value >> 16)) && (tab_reg[1] == (value & 0xFFFF)));
@@ -880,7 +901,7 @@ int send_crafted_request(modbus_t *ctx, int function,
             req[5] = max_value & 0xFF;
             if (bytes) {
                 /* Write query (nb values * 2 to convert in bytes for registers) */
-                req[6] = bytes;
+                req[6] = (uint8_t)bytes;
             }
         }
 

@@ -13,6 +13,7 @@ option(LIBMODBUS_DOC "Build libmodbus documents" OFF)
 option(LIBMODBUS_TESTS "Build libmodbus tests" OFF)
 option(LIBMODBUS_WITH_RTU "Build libmodbus with RTU support" ON)
 option(LIBMODBUS_WITH_TCP "Build libmodbus with TCP support" ON)
+option(LIBMODBUS_WITH_UDP "Build libmodbus with UDP support" OFF)
 option(BUILD_SHARED_LIBS "Build libmodbus as shared library" OFF)
 
 set(CMAKE_C_STANDARD 99)

@@ -55,7 +55,6 @@ if (LIBMODBUS_WITH_TCP)
 endif ()
 
 if (LIBMODBUS_WITH_TCP AND LIBMODBUS_WITH_RTU)
-  if(NOT MSVC)
     set(unit_test_client_target "unit-test-client")
     add_executable(${unit_test_client_target} "unit-test-client.c")
     target_include_directories(${unit_test_client_target} PUBLIC
@@ -81,7 +80,6 @@ if (LIBMODBUS_WITH_TCP AND LIBMODBUS_WITH_RTU)
     install(TARGETS ${unit_test_server_target}
       LIBRARY DESTINATION bin
       ARCHIVE DESTINATION bin)
-  endif()
 
   set(bandwidth_client_target "bandwidth-client")
   set(bandwidth_client_source "bandwidth-client.c")

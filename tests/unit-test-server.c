@@ -5,14 +5,16 @@
  */
 
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <modbus.h>
 #ifdef _WIN32
 # include <winsock2.h>
+# define close closesocket
+# define usleep(x) Sleep ( ( x ) / 1000 )
 #else
+# include <unistd.h>
 # include <sys/socket.h>
 #endif
 
@@ -23,10 +25,18 @@
 
 #include "unit-test.h"
 
+#ifdef _WIN32
+#define DEFAULT_TEST_PORT "COM1"
+#else
+#define DEFAULT_TEST_PORT "/dev/ttyUSB0"
+#endif
+
 enum {
     TCP,
     TCP_PI,
-    RTU
+    RTU,
+    UDP,
+    UDP_PI
 };
 
 int main(int argc, char*argv[])
@@ -47,8 +57,12 @@ int main(int argc, char*argv[])
             use_backend = TCP_PI;
         } else if (strcmp(argv[1], "rtu") == 0) {
             use_backend = RTU;
+        } else if (strcmp(argv[1], "udp") == 0) {
+            use_backend = UDP;
+        } else if (strcmp(argv[1], "udppi") == 0) {
+            use_backend = UDP_PI;
         } else {
-            printf("Usage:\n  %s [tcp|tcppi|rtu] - Modbus server for unit testing\n\n", argv[0]);
+            printf("Usage:\n  %s [tcp|tcppi|rtu|udp|udppi] - Modbus server for unit testing\n\n", argv[0]);
             return -1;
         }
     } else {
@@ -62,8 +76,14 @@ int main(int argc, char*argv[])
     } else if (use_backend == TCP_PI) {
         ctx = modbus_new_tcp_pi("::0", "1502");
         query = malloc(MODBUS_TCP_MAX_ADU_LENGTH);
+    } else if (use_backend == UDP) {
+        ctx = modbus_new_udp("0.0.0.0", 1502);
+        query = malloc(MODBUS_UDP_MAX_ADU_LENGTH);
+    } else if (use_backend == UDP_PI) {
+        ctx = modbus_new_udp_pi("::0", "1502");
+        query = malloc(MODBUS_UDP_MAX_ADU_LENGTH);
     } else {
-        ctx = modbus_new_rtu("/dev/ttyUSB0", 115200, 'N', 8, 1);
+        ctx = modbus_new_rtu(DEFAULT_TEST_PORT, 115200, 'N', 8, 1);
         modbus_set_slave(ctx, SERVER_ID);
         query = malloc(MODBUS_RTU_MAX_ADU_LENGTH);
     }
@@ -101,6 +121,10 @@ int main(int argc, char*argv[])
     } else if (use_backend == TCP_PI) {
         s = modbus_tcp_pi_listen(ctx, 1);
         modbus_tcp_pi_accept(ctx, &s);
+    } else if (use_backend == UDP) {
+        modbus_udp_bind(ctx);
+    } else if (use_backend == UDP_PI) {
+        modbus_udp_pi_bind(ctx);
     } else {
         rc = modbus_connect(ctx);
         if (rc == -1) {

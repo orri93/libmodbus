@@ -10,6 +10,10 @@ if (LIBMODBUS_WITH_TCP)
   list(APPEND libmodbus_source modbus-tcp.c)
   list(APPEND libmodbus_public_header modbus-tcp.h)
 endif ()
+if (LIBMODBUS_WITH_UDP)
+  list(APPEND libmodbus_source modbus-udp.c)
+  list(APPEND libmodbus_public_header modbus-udp.h)
+endif ()
 
 add_library(${libmodbus_library_target} ${libmodbus_source})
 
