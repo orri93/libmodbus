@@ -58,7 +58,9 @@
 #include "modbus-udp.h"
 #include "modbus-udp-private.h"
 
-static char udp_buffer_[MODBUS_UDP_MAX_ADU_LENGTH];
+#define MODBUS_UDP_MAX_RECV_LENGTH 0xffff
+
+static char udp_buffer_[MODBUS_UDP_MAX_RECV_LENGTH];
 
 #ifdef OS_WIN32
 static int _modbus_udp_init_win32(void)
@@ -166,22 +168,15 @@ static int _modbus_udp_send_msg_pre(uint8_t* req, int req_length)
 
 static ssize_t _modbus_udp_send(modbus_t* ctx, const uint8_t* req, int req_length)
 {
+  int flags = 0;
   modbus_udp_t* ctx_udp = ctx->backend_data;
-  
   return sendto(
     ctx->s,
     (const char*)req,
     req_length,
-    0,
+    flags,
     (const struct sockaddr*) &ctx_udp->cliaddr,
     ctx_udp->cliaddrlen);
-
-  /* MSG_NOSIGNAL
-     Requests not to send SIGPIPE on errors on stream oriented
-     sockets when the other end breaks the connection.  The EPIPE
-     error is still returned. */
-
-  //return send(ctx->s, (const char*)req, req_length, MSG_NOSIGNAL);
 }
 
 static int _modbus_udp_receive(modbus_t* ctx, uint8_t* req) {
@@ -197,11 +192,11 @@ static ssize_t _modbus_udp_recv(modbus_t* ctx, uint8_t* rsp, int rsp_length) {
   if (ctx_udp->rc == 0) {
     ctx_udp->cliaddrlen = sizeof(ctx_udp->cliaddr);
     memset(&(ctx_udp->cliaddr), 0, ctx_udp->cliaddrlen);
-    memset(udp_buffer_, 0, MODBUS_UDP_MAX_ADU_LENGTH);
+    memset(udp_buffer_, 0, MODBUS_UDP_MAX_RECV_LENGTH);
     ctx_udp->rc = recvfrom(
       ctx->s,
       udp_buffer_,
-      MODBUS_UDP_MAX_ADU_LENGTH,
+      MODBUS_UDP_MAX_RECV_LENGTH,
       flags,
       (struct sockaddr*) & (ctx_udp->cliaddr),
       &(ctx_udp->cliaddrlen));
