@@ -293,8 +293,11 @@ int modbus_udp_bind(modbus_t* ctx)
 
   addr.sin_family = AF_INET;
   addr.sin_port = htons(ctx_udp->port);
-  /* addr.sin_addr.s_addr = inet_addr(ctx_udp->ip); */
-  addr.sin_addr.s_addr = INADDR_ANY;
+  if(ctx_udp->ip[0] == '\0') {
+    addr.sin_addr.s_addr = INADDR_ANY;
+  } else {
+    addr.sin_addr.s_addr = inet_addr(ctx_udp->ip);
+  }
 
   rc = bind(ctx->s, (struct sockaddr*) & addr, sizeof(addr));
 
@@ -446,7 +449,7 @@ modbus_t* modbus_new_udp(const char* ip, int port)
       return NULL;
     }
   } else {
-    ctx_udp->ip[0] = '0';
+    ctx_udp->ip[0] = '\0';
   }
   ctx_udp->port = port;
   ctx_udp->t_id = 0;
