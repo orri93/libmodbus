@@ -165,3 +165,7 @@
 
 /* Define as `fork' if `vfork' does not work. */
 #define vfork fork
+
+
+/* Define LIBMODBUS_BUILD_SHARED_LIBS if building shared */
+@LIBMODBUS_DEFINE_BUILD_SHARED_LIBS@
