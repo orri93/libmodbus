@@ -29,6 +29,8 @@ Makefile.in
 /stamp-h1
 /*.sublime-*
 /.vscode
+CMakeFiles/
+CMakeSettings.json
 src/modbus-version.h
 src/win32/modbus.dll.manifest
 tests/bandwidth-client
@@ -45,3 +47,4 @@ doc/*.html
 doc/*.3
 doc/*.7
 out/
+.vs/
